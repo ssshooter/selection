@@ -1,7 +1,14 @@
 {
     "parser": "@typescript-eslint/parser",
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "globals": {
+        "VERSION": true
+    },
     "extends": [
-        "../../.eslintrc",
+        "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
     ],
@@ -14,6 +21,9 @@
         "ecmaVersion": 2018
     },
     "rules": {
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "semi": "error",
+        "no-console": "error",
+        "object-curly-spacing": ["error", "never"]
     }
 }

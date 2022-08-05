@@ -8,7 +8,7 @@ export * from './types';
 
 // Some var shorting for better compression and readability
 const {abs, max, min, ceil} = Math;
-
+const maxSpeed = 18;
 export default class SelectionArea extends EventTarget<SelectionEvents> {
     public static version = VERSION;
 
@@ -138,6 +138,7 @@ export default class SelectionArea extends EventTarget<SelectionEvents> {
     }
 
     _onTapStart(evt: MouseEvent | TouchEvent, silent = false): void {
+        if((evt as any).button !== 2){return;}
         const {x, y, target} = simplifyEvent(evt);
         const {_options} = this;
         const {document} = this._options;
@@ -461,20 +462,24 @@ export default class SelectionArea extends EventTarget<SelectionEvents> {
         const {behaviour: {scrolling: {startScrollMargins}}} = _options;
 
         if (x2 < brect.left + startScrollMargins.x) {
-            _scrollSpeed.x = scrollLeft ? -abs(brect.left - x2 + startScrollMargins.x) : 0;
+            const speed = max(abs(brect.left - x2 + startScrollMargins.x),maxSpeed);
+            _scrollSpeed.x = scrollLeft ? -speed : 0;
             x2 = x2 < brect.left ? brect.left : x2;
         } else if (x2 > brect.right - startScrollMargins.x) {
-            _scrollSpeed.x = scrollWidth - scrollLeft - clientWidth ? abs(brect.left + brect.width - x2 - startScrollMargins.x) : 0;
+            const speed = max(abs(brect.left + brect.width - x2 - startScrollMargins.x),maxSpeed);
+            _scrollSpeed.x = scrollWidth - scrollLeft - clientWidth ? speed : 0;
             x2 = x2 > brect.right ? brect.right : x2;
         } else {
             _scrollSpeed.x = 0;
         }
 
         if (y2 < brect.top + startScrollMargins.y) {
-            _scrollSpeed.y = scrollTop ? -abs(brect.top - y2 + startScrollMargins.y) : 0;
+            const speed = max(abs(brect.top - y2 + startScrollMargins.y),maxSpeed);
+            _scrollSpeed.y = scrollTop ? -speed : 0;
             y2 = y2 < brect.top ? brect.top : y2;
         } else if (y2 > brect.bottom - startScrollMargins.y) {
-            _scrollSpeed.y = scrollHeight - scrollTop - clientHeight ? abs(brect.top + brect.height - y2 - startScrollMargins.y) : 0;
+            const speed = max(abs(brect.top + brect.height - y2 - startScrollMargins.y),maxSpeed);
+            _scrollSpeed.y = scrollHeight - scrollTop - clientHeight ? speed : 0;
             y2 = y2 > brect.bottom ? brect.bottom : y2;
         } else {
             _scrollSpeed.y = 0;
@@ -516,6 +521,7 @@ export default class SelectionArea extends EventTarget<SelectionEvents> {
         this._keepSelection();
 
         if (evt && _singleClick && features.singleTap.allow) {
+            evt.preventDefault();
             this._onSingleTap(evt);
         } else if (!_singleClick && !silent) {
             this._updateElementSelection();
